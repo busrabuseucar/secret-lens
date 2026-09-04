@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="tr">
+<head>
+ <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+ <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; connect-src 'none'; worker-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
+ <title>SecretLens · Yerel gizli değer tarayıcısı</title>
+ <meta name="description" content="Küçük kaynak dosyalarını tarayıcıda tara. Olası gizli değerleri maskeli bulgularla incele; veriler sunucuya gönderilmez.">
+ <link rel="icon" href="/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="/styles.css">
+ <script type="module" src="/app.js"></script>
+</head>
+<body>
+<header class="topbar"><a class="brand" href="/" aria-label="SecretLens ana sayfa"><span class="mark" aria-hidden="true">S/</span>SecretLens <span class="version">01</span></a><span class="local-label">TARAMA CİHAZINDA ÇALIŞIR</span><a class="source-link" href="/download/secret-lens-source.zip" download>Kaynak kodu indir <span aria-hidden="true">↗</span></a></header>
+<main>
+ <section class="intro"><div><p class="eyebrow">KOD İNCELEME MASASI</p><h1>Gizli değerleri<br><span>paylaşmadan fark et.</span></h1></div><p>Kodunu veya UTF-8 dosyalarını tara.<br>Bulgulardaki değerler maskelenir.<br>Dosya içeriği sunucuya gönderilmez.</p></section>
+ <div class="workspace">
+  <section class="input-panel" aria-labelledby="input-title">
+   <div class="panel-heading"><h2 id="input-title">01 <span>Taranacak içerik</span></h2><button id="clear" class="text-button" type="button">Temizle</button></div>
+   <div class="samples"><span>SENTETİK ÖRNEK</span><div class="segmented"><button id="sample-before" type="button" aria-pressed="true">Düzeltmeden önce</button><button id="sample-after" type="button" aria-pressed="false">Düzelttikten sonra</button></div></div>
+   <label class="file-drop" for="files"><strong>Dosya seç</strong><span>Birden fazla UTF-8 metin dosyası seçebilirsin.</span><input id="files" type="file" multiple aria-describedby="limits"></label>
+   <p id="limits" class="hint">En fazla 20 dosya · dosya başına 512 KiB · toplam 2 MiB</p>
+   <label class="code-label" for="code">veya kod yapıştır</label>
+   <textarea id="code" spellcheck="false" autocomplete="off" autocapitalize="off" aria-describedby="code-help" placeholder="API_KEY = &quot;…&quot;"></textarea>
+   <p id="code-help" class="hint">Yapıştırdığın metin bu alanda görünür. Tarama sonuçları değerleri göstermez.</p>
+   <div id="selection" class="selection"></div>
+   <button id="scan" class="primary" type="button">İçeriği tara <span aria-hidden="true">↗</span></button>
+   <p id="status" class="status" role="status" aria-live="polite">Sentetik örnek hazırlanıyor…</p>
+  </section>
+  <section class="results-panel" aria-labelledby="results-title" aria-busy="false" id="results-panel">
+   <div class="panel-heading"><h2 id="results-title">02 <span>Tarama bulguları</span></h2><span id="mode" class="mode">SENTETİK ÖRNEK</span></div>
+   <div class="metrics"><div><strong id="count-total">—</strong><span>Toplam bulgu</span></div><div><strong id="count-high">—</strong><span>Öncelikli inceleme</span></div><div><strong id="count-files">—</strong><span>Taranan dosya</span></div></div>
+   <div class="results-tools"><label for="filter">Göster <select id="filter"><option value="all">Tüm bulgular</option><option value="high">Öncelikli inceleme</option><option value="review">İncele</option></select></label><button id="export" type="button" class="outline" disabled>Maskeli JSON indir</button></div>
+   <p id="result-note" class="result-note">Beş kural, yalnızca olası eşleşmeleri gösterir.</p>
+   <div id="findings" class="findings"></div>
+   <p class="privacy-note">Raporda ham değer, kod parçası veya gerçek dosya adı bulunmaz. Dosyalar “dosya-01” gibi adlarla gösterilir.</p>
+  </section>
+ </div>
+ <section class="scope" aria-labelledby="scope-title"><div><p class="eyebrow">TARAMANIN SINIRI</p><h2 id="scope-title">Bir bulgu, inceleme başlangıcıdır.</h2></div><div><p>Token geçerliliği kontrol edilmez. Yanlış eşleşmeler ve kaçırılan değerler olabilir. Bulgu bulunmaması, kodun güvenli olduğunu kanıtlamaz.</p><p>Bu sürüm yalnızca seçilen metni tarar; Git geçmişini, arşivleri ve çok satırlı gizli değerleri çözümlemez.</p></div></section>
+ <details class="rules"><summary>Beş tarama kuralını gör</summary><div id="rule-list"></div></details>
+</main>
+<footer><span>SecretLens · Büşra Buse Uçar</span><span>AI desteğiyle geliştirilmiş öğrenme projesi</span></footer>
+</body></html>
