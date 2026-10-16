@@ -1,6 +1,6 @@
 # SecretLens
 
-Küçük kaynak dosyalarında olası gizli değerleri bulan, sonuçları **tamamen maskeli** döndüren TypeScript öğrenme projesi. Tarayıcı demosu ve Node.js CLI aynı tarama motorunu kullanır.
+Küçük kaynak dosyalarında olası gizli değerleri bulan, sonuçları **tamamen maskeli** döndüren TypeScript uygulaması. Tarayıcı demosu ve Node.js CLI aynı tarama motorunu kullanır.
 
 **Geliştiren:** Büşra Buse Uçar
 
@@ -9,7 +9,7 @@ Küçük kaynak dosyalarında olası gizli değerleri bulan, sonuçları **tamam
 
 ## Çalıştırma
 
-Node.js 24+ ve kaynak ZIP hazırlamak için Python 3 gerekir. Depoyu klonla:
+Node.js 24+ ve kaynak ZIP ve paketleme testleri için Python 3.10+ gerekir. Depoyu klonla:
 
 ```bash
 git clone https://github.com/busrabuseucar/secret-lens.git
@@ -18,12 +18,13 @@ npm ci
 npm run check
 npm run build
 npm test
+python3 -m unittest discover -s tests -p 'test_*.py'
 npm run source
 node scripts/check-assets.mjs
 npm start
 ```
 
-Yerel demo: `http://127.0.0.1:8080`. `file://` yerine HTTP sunucusu kullan; modül tabanlı Web Worker buna ihtiyaç duyar. Kaynak indirme bağlantısı için `npm run source` çalıştırılmış olmalı.
+Yerel demo: `http://127.0.0.1:8080`. `file://` yerine HTTP sunucusu kullan; modül tabanlı Web Worker buna ihtiyaç duyar. Göreli dosya yolları sayesinde alt dizin altında da yayımlanabilir. Kaynak indirme bağlantısı için `npm run source` çalıştırılmış olmalı.
 
 ## 60 saniyelik demo
 
@@ -62,7 +63,7 @@ CLI normal dosyaları kabul eder; klasörleri ve sembolik bağlantıları redded
 | `credential-url` | Desteklenen protokollerde `user:password@` | Öncelikli |
 | `secret-assignment` | Parola/API anahtarı/secret adlı değişkene tek satırlı sabit atama | İncele |
 
-Genel atama kuralı 4–512 karakterli değerleri dikkate alır. Basit `process.env`, `os.getenv`, `import.meta.env` referansları ve açık `${NAME}`, `<NAME>`, `YOUR_NAME`, `CHANGEME`, `REPLACE_ME` yer tutucuları atlanır. Yorum satırları da taranır; sıradan `example123` gibi değerler otomatik olarak güvenli kabul edilmez. Özel bir kuralın yakaladığı değere ayrıca genel atama bulgusu eklenmez.
+Genel atama kuralı 4–512 karakterli değerleri dikkate alır. Tırnak dışında kullanılan basit `process.env`, `os.getenv`, `import.meta.env` referansları ve açık `${NAME}`, `<NAME>`, `YOUR_NAME`, `CHANGEME`, `REPLACE_ME` yer tutucuları atlanır. Tırnak içindeki `"process.env.PASSWORD"` veya `"false"` gibi değerler kod referansı değil, sabit metin sayılır ve taranır. 512 karakterden uzun genel atamalar kısmi eşleşme olarak raporlanmaz; bu kuralın kapsamı dışındadır. Yorum satırları da taranır; sıradan `example123` gibi değerler otomatik olarak güvenli kabul edilmez. Özel bir kuralın yakaladığı değere ayrıca genel atama bulgusu eklenmez.
 
 ## Gizlilik ve sınırlar
 
@@ -87,9 +88,22 @@ cli.mjs         Aynı motoru kullanan yerel CLI
 tests/          Motor, gerçek CLI ve worker sınırı testleri
 ```
 
-Çalışma zamanında üçüncü taraf bağımlılık yok; derleme için TypeScript 5.9.3 kullanılır. Yerel doğrulamada **30 test geçti**: 21 motor, 7 gerçek CLI ve 2 worker sınırı testi. CI, tür kontrolü, derleme, testler, kaynak ZIP'i ve statik dosya bağlantılarını doğrulayacak şekilde yapılandırılmıştır. [GitHub'daki çalışma sonuçlarını incele](https://github.com/busrabuseucar/secret-lens/actions/workflows/ci.yml). Tarayıcı görsel/uçtan uca testi bu doğrulamalara dahil değildir.
+## Doğrulama ve kaynak paketi
 
+Çalışma zamanında üçüncü taraf bağımlılık yok. Geliştirme bağımlılıkları TypeScript 5.9.3 ve Playwright 1.58.2 olarak sabitlendi.
 
+- **32 Node testi:** 23 motor, 7 gerçek CLI ve 2 worker sınırı testi.
+- **1 Python testi:** kaynak arşivine özel yerel dosyaların ve sembolik bağlantıların alınmaması.
+- **8 Chromium senaryosu:** dört akışın masaüstü ve Pixel 7 emülasyonunda gerçek Web Worker ile çalıştırılması. Önce/sonra örnekleri, filtrelenmemiş maskeli rapor indirme, dosya yükleme, güvenli DOM metni, ağ/depolama kontrolü, temizleme, bozuk dosyadan kurtarma ve 500 bulgu sınırı doğrulanır. Bu testler fiziksel cihaz testi veya kapsamlı güvenlik sertifikası değildir.
+
+```bash
+npx playwright install chromium
+npm run test:browser
+```
+
+CI tür kontrolü, derleme, Node/Python testleri, kaynak ZIP, statik dosya yolları ve Chromium testlerini çalıştırır. Hata halinde tarayıcı izleri saklanır. Testlerde yalnızca sentetik değerler kullanılır.
+
+Kaynak ZIP açık dosya/dizin/uzantı listesiyle hazırlanır. Ortam dosyaları, özel JSON/veritabanı dosyaları, sembolik bağlantılar, bağımlılıklar ve test çıktıları dışarıda kalır; yayın kimliği yerine yalnızca `dist` dizinini tanımlayan manifest eklenir. Bu paketleme kuralı sır tarayıcısı değildir: izin verilen kaynak dosyalarına yazılmış kimlik bilgilerini otomatik temizlemez.
 
 ## Dayanaklar
 

@@ -75,3 +75,19 @@ test('finding cap distinguishes exactly 500 from incomplete scans',()=>{
 test('all files are validated before a partial result can be produced',()=>{
  assert.throws(()=>scan([{name:'a',text:'password="demoPass"\n'.repeat(501)},{name:'b',text:'\0'}]),/İkili/);
 });
+
+test('quoted environment-looking and primitive-looking values remain literals',()=>{
+ for(const value of ['process.env.PASSWORD','os.getenv(PASSWORD)','import.meta.env.PASSWORD','false','null','None']) {
+   const result=one(`password="${value}"`);
+   assert.equal(result.findings.length,1,value);
+   assert.equal(result.findings[0].rule,'secret-assignment');
+ }
+ for(const text of ['password=process.env.PASSWORD','password=false','password=null'])assert.equal(one(text).findings.length,0);
+});
+
+test('assignment length bound never reports a prefix of an oversized value',()=>{
+ for(const quote of ['', '"', "'"]){
+  assert.equal(one('password='+quote+'x'.repeat(512)+quote).findings.length,1);
+  assert.equal(one('password='+quote+'x'.repeat(513)+quote).findings.length,0);
+ }
+});

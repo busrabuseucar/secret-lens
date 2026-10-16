@@ -1,0 +1,76 @@
+import {test, expect} from '@playwright/test';
+import {readFile} from 'node:fs/promises';
+async function report(page) {
+ const downloadPromise=page.waitForEvent('download');
+ await page.locator('#export').click();
+ const download=await downloadPromise;
+ return readFile(await download.path(),'utf8');
+}
+test('actual worker scans samples; filtering does not narrow the masked report', async ({page})=>{
+ const errors=[];page.on('pageerror',error=>errors.push(error.message));
+ await page.goto('./');
+ await expect(page.locator('#count-total')).toHaveText('5');
+ await expect(page.locator('#count-high')).toHaveText('3');
+ await expect(page.locator('#count-files')).toHaveText('2/2');
+ await page.locator('#filter').selectOption('high');
+ await expect(page.locator('.finding')).toHaveCount(3);
+ const data=JSON.parse(await report(page));
+ expect(data.findings).toHaveLength(5);
+ expect(data.findings.every(f=>f.value==='[MASKELENDİ]')).toBe(true);
+ await page.locator('#sample-after').click();
+ await expect(page.locator('#count-total')).toHaveText('0');
+ await expect(page.locator('#findings')).toContainText('güvenlik garantisi değildir');
+ expect(JSON.parse(await report(page)).findings).toHaveLength(0);
+ expect(errors).toEqual([]);
+});
+test('file values stay out of results, exports, network and storage', async ({page})=>{
+ const requests=[];page.on('request',r=>requests.push({url:r.url(),method:r.method(),body:r.postData()}));
+ await page.goto('./');
+ await expect(page.locator('#count-total')).toHaveText('5');
+ const sentinel='PRIVATE_SENTINEL_7719';
+ const filename='<img src=x onerror=alert(1)>.txt';
+ await page.locator('#files').setInputFiles({name:filename,mimeType:'text/plain',buffer:Buffer.from(`password="${sentinel}"\npassword="process.env.PASSWORD"`)});
+ await expect(page.locator('#export')).toBeDisabled();
+ await page.locator('#scan').click();
+ await expect(page.locator('#count-total')).toHaveText('2');
+ await expect(page.locator('#findings')).not.toContainText(sentinel);
+ await expect(page.locator('#findings')).toContainText(filename);
+ await expect(page.locator('#findings img')).toHaveCount(0);
+ const raw=await report(page);
+ expect(raw).not.toContain(sentinel);expect(raw).not.toContain(filename);expect(raw).not.toContain('process.env.PASSWORD');
+ expect(JSON.parse(raw).findings.every(f=>f.file==='dosya-01')).toBe(true);
+ expect(requests.every(r=>r.method==='GET'&&r.body===null&&r.url.startsWith('http://127.0.0.1:4173/dist/'))).toBe(true);
+ expect(await page.evaluate(()=>({local:localStorage.length,session:sessionStorage.length}))).toEqual({local:0,session:0});
+ await page.locator('#clear').click();
+ await expect(page.locator('#export')).toBeDisabled();
+ await expect(page.locator('#code')).toHaveValue('');
+ await expect(page.locator('#selection')).toBeEmpty();
+ expect(await page.locator('#files').evaluate(input=>input.files.length)).toBe(0);
+});
+test('invalid files clear old results and a later scan recovers', async ({page})=>{
+ await page.goto('./');
+ await expect(page.locator('#count-total')).toHaveText('5');
+ await page.locator('#files').setInputFiles({name:'binary.txt',mimeType:'text/plain',buffer:Buffer.from([65,0,66])});
+ await page.locator('#scan').click();
+ await expect(page.locator('#status')).toContainText('İkili dosyalar');
+ await expect(page.locator('#count-total')).toHaveText('—');
+ await expect(page.locator('#export')).toBeDisabled();
+ await page.locator('#code').fill('password="new_synthetic_value"');
+ await page.locator('#scan').click();
+ await expect(page.locator('#count-total')).toHaveText('1');
+ await page.locator('#code').fill('nothing sensitive here');
+ await expect(page.locator('#export')).toBeDisabled();
+ await expect(page.locator('#count-total')).toHaveText('—');
+ await page.locator('#scan').click();
+ await expect(page.locator('#count-total')).toHaveText('0');
+});
+test('finding cap is visibly incomplete and remains marked in downloaded JSON',async({page})=>{
+ await page.goto('./');
+ await expect(page.locator('#count-total')).toHaveText('5');
+ await page.locator('#code').fill('password="synthetic_value"\n'.repeat(501));
+ await page.locator('#scan').click();
+ await expect(page.locator('#count-total')).toHaveText('500+');
+ await expect(page.locator('#result-note')).toContainText('Tarama eksik');
+ const data=JSON.parse(await report(page));
+ expect(data.truncated).toBe(true);expect(data.findings).toHaveLength(500);
+});

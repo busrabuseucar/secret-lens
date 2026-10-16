@@ -38,12 +38,14 @@ function hitsForLine(line:string):Hit[] {
    if(!placeholder(m[2]!))add(m.index!,m[0],'credential-url');
  }
  // Deliberately bounded, single-line literals; comments are scanned too.
- const assignment=/\b(?:[a-z0-9]{1,32}_){0,3}(?:password|passwd|pwd|secret|api_?key|access_?token|auth_?token|client_?secret)\b["']?\s*[:=]\s*(?:"([^"\r\n]{1,512})"|'([^'\r\n]{1,512})'|([^\s"'`,;#}{]{1,512}))/gi;
+ const assignment=/\b(?:[a-z0-9]{1,32}_){0,3}(?:password|passwd|pwd|secret|api_?key|access_?token|auth_?token|client_?secret)\b["']?\s*[:=]\s*(?:"([^"\r\n]{1,512})"|'([^'\r\n]{1,512})'|([^\s"'`,;#}{]{1,512})(?![^\s"'`,;#}{]))/gi;
  for(const m of line.matchAll(assignment)) {
    const value=m[1]??m[2]??m[3]??'';
    // Code references are not literals. Known explicit placeholders are ignored.
-   if(value.length<4||placeholder(value)||/^(?:process\.env\.|os\.(?:getenv|environ)|import\.meta\.env\.|env\[|getenv\(|\$\{)/.test(value))continue;
-   if(/^(?:true|false|null|undefined|none)$/i.test(value))continue;
+   if(value.length<4||placeholder(value))continue;
+   const unquoted=m[3]!==undefined;
+   if(unquoted&&/^(?:process\.env\.|os\.(?:getenv|environ)|import\.meta\.env\.|env\[|getenv\(|\$\{)/.test(value))continue;
+   if(unquoted&&/^(?:true|false|null|undefined|none)$/i.test(value))continue;
    const start=m.index!+m[0].lastIndexOf(value);
    if(hits.some(h=>start<h.end&&start+value.length>h.start))continue;
    add(start,value,'secret-assignment');
