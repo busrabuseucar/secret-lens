@@ -85,15 +85,11 @@ src/app.ts       Dosya/metin akışı ve güvenli DOM metni
 src/sample.ts    Sentetik önce/sonra örnekleri
 cli.mjs         Aynı motoru kullanan yerel CLI
 tests/          Motor, gerçek CLI ve worker sınırı testleri
-docs/           Öğrenme planı ve CV taslağı
 ```
 
 Çalışma zamanında üçüncü taraf bağımlılık yok; derleme için TypeScript 5.9.3 kullanılır. Yerel doğrulamada **30 test geçti**: 21 motor, 7 gerçek CLI ve 2 worker sınırı testi. CI, tür kontrolü, derleme, testler, kaynak ZIP'i ve statik dosya bağlantılarını doğrulayacak şekilde yapılandırılmıştır. [GitHub'daki çalışma sonuçlarını incele](https://github.com/busrabuseucar/secret-lens/actions/workflows/ci.yml). Tarayıcı görsel/uçtan uca testi bu doğrulamalara dahil değildir.
 
-## Öğrenme ve CV
 
-- [Adım adım öğrenme ve hata düzeltme alıştırması](docs/LEARNING.md)
-- [CV metni ve mülakat hazırlığı](docs/CV.md)
 
 ## Dayanaklar
 
