@@ -38,4 +38,4 @@ Alıştırma henüz uygulanmadı. Ana daldaki testler mevcut minimum uzunluğu k
 - 500 bulgu sınırına ulaşıldığında neden sonuç “tamamlandı ve temiz” sayılamaz?
 - Sızan anahtarı koddan silmenin neden iptal etmenin yerini tutmadığı.
 
-Geliştirme AI desteğiyle yapıldı. CV ve görüşmelerde özellikle kendi incelediğin, değiştirdiğin ve açıklayabildiğin bölümleri anlat.
+CV ve görüşmelerde özellikle kendi incelediğin, değiştirdiğin ve açıklayabildiğin bölümleri anlat.
