@@ -1,5 +1,11 @@
 # SecretLens
 
+## Canlı demonun kapsamı
+
+[Demoyu aç](https://secret-lens-buse.sleek-brush-8818.chatgpt.site)
+
+Metin ve dosya taraması tarayıcıda gerçekten çalışır; hazır örnekler sentetiktir. İçerik sunucuya gönderilmez. Bulgular olası eşleşmelerdir; anahtar geçerliliği doğrulanmaz.
+
 Küçük kaynak dosyalarında olası gizli değerleri bulan, sonuçları **tamamen maskeli** döndüren TypeScript uygulaması. Tarayıcı demosu ve Node.js CLI aynı tarama motorunu kullanır.
 
 **Geliştiren:** Büşra Buse Uçar
