@@ -116,3 +116,7 @@ Bu proje bağımsız ve sınırlı bir eğitim uygulamasıdır; aşağıdaki ür
 - [OWASP Secrets Management: iptal ve döndürme](https://cheatsheetseries.owasp.org/cheatsheets/Secrets_Management_Cheat_Sheet.html)
 
 MIT lisansı.
+
+## İşletim
+
+[İşletim ve sürüm doğrulama](docs/OPERATIONS.md) — kurulum, veri saklama, yayın, geri dönüş ve doğrulama kapsamı.
