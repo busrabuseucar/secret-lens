@@ -2,7 +2,7 @@
 
 Küçük kaynak dosyalarında olası gizli değerleri bulan, sonuçları **tamamen maskeli** döndüren TypeScript öğrenme projesi. Tarayıcı demosu ve Node.js CLI aynı tarama motorunu kullanır.
 
-**Geliştiren:** Büşra Buse Uçar · AI desteğiyle geliştirilmiştir. Kod, testler ve tasarım AI yardımı içerir; kişisel katkı ve öğrenme süreci bu kapsamda değerlendirilmelidir.
+**Geliştiren:** Büşra Buse Uçar
 
 **Herkese açık demo:** [SecretLens'i aç](https://secret-lens-buse.sleek-brush-8818.chatgpt.site)  
 **Kaynak kod:** [busrabuseucar/secret-lens](https://github.com/busrabuseucar/secret-lens) · **CI:** [GitHub Actions](https://github.com/busrabuseucar/secret-lens/actions/workflows/ci.yml)
